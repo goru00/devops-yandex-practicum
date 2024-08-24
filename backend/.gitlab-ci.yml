@@ -1,0 +1,34 @@
+stages:
+  - build
+  - notify
+
+build-backend-code-job:
+  stage: build
+  script:
+    - echo "BUILD_BACKEND_JOB_ID=${CI_JOB_ID}" > backend_job_variables.env
+    - cd backend
+    - mvn package
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /send notification/
+      changes:
+        - backend/**/*
+  artifacts:
+    paths:
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
+      - backend_job_variables.env
+
+telegram-notification-backend:
+  stage: notify
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /send notification/
+      changes:
+        - backend/**/*
+  variables:
+    API_TELEGRAM: "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+  script:
+    - source backend_job_variables.env
+    - |
+      curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал backend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_BACKEND_JOB_ID}/artifacts/download\"}"
+  needs:
+    - build-backend-code-job
+  
