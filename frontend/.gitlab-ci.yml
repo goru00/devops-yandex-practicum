@@ -6,8 +6,12 @@ build-frontend-code-job:
     - npm install
     - npm run build
   only:
-    changes:
-      - frontend/**/*
+    - pushes
+    - merge_requests
+  cache:
+    - key: npm
+      paths: 
+        - frontend/.npm
   artifacts:
     paths:
       - frontend/dist/frontend
@@ -16,8 +20,8 @@ build-frontend-code-job:
 sonarqube-frontend-sast:
   stage: test
   only:
-    changes:
-      - frontend/**/*
+    - pushes
+    - merge_requests
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
@@ -47,10 +51,8 @@ sonarqube-frontend-sast:
 telegram-notification-frontend:
   stage: notify
   only:
-    changes:
-      - frontend/**/*
-  variables:
-    API_TELEGRAM: "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+    - pushes
+    - merge_requests
   script:
     - source frontend_job_variables.env
     - |
@@ -58,3 +60,4 @@ telegram-notification-frontend:
   needs:
     - build-frontend-code-job
     - sonarqube-frontend-sast
+    - nodejs-scan-sast
