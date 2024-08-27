@@ -1,42 +1,39 @@
+variables:
+  MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
+
 build-backend-code-job:
   stage: build
   script:
     - echo "BUILD_BACKEND_JOB_ID=${CI_JOB_ID}" > backend_job_variables.env
     - cd backend
-    - mvn package
+    - mvn package -Dmaven.repo.local=${MAVEN_REPO_PATH}
   only:
-    changes:
-      - backend/**/*
+    - pushes
+    - merge_requests
   cache:
-    policy: pull-push
-    unprotect: false
-    untracked: false
-    when: on_success
-    paths:
-      - ${CI_PROJECT_DIR}/.m2/repository
+    - key: maven
+      paths:
+        - .m2/repository
   artifacts:
     expire_in: 1 day
     paths:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
       - backend_job_variables.env
+      - ${CI_PROJECT_DIR}/.m2/
 
 sonarqube-backend-sast:
   stage: test
   image: maven:3.8-openjdk-16
+  only:
+    - pushes
+    - merge_requests
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
-  only:
-    changes:
-      - backend/**/*
   cache:
-    policy: pull-push
-    unprotect: false
-    untracked: false
-    when: on_success
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
+    - key: sonar
+      paths: 
+        - .sonar/cache
   allow_failure: true
   script:
     - cd backend
@@ -46,28 +43,27 @@ sonarqube-backend-sast:
       -Dsonar.host.url=${SONAR_URL} 
       -Dsonar.login=${SONAR_LOGIN_BACK} 
       -Dsonar.projectName=${SONAR_PROJECT_NAME_BACK}
-  needs:
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  dependencies:
     - build-backend-code-job
 
 semgrep-sast:
   stage: test
   rules:
-    - changes: 
-      - backend/**/*
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
     COMPILE: "false"
-    SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: "$CI_PROJECT_DIR/.m2/repository"
-  needs:
+    SAST_JAVA_VERSION: 16
+    MAVEN_REPO_PATH: ${MAVEN_REPO_PATH}
+  dependencies:
     - build-backend-code-job
 
 telegram-notification-backend:
   stage: notify
   only:
-    changes:
-      - backend/**/*
-  variables:
-    API_TELEGRAM: "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+    - pushes
+    - merge_requests
   script:
     - source backend_job_variables.env
     - |
