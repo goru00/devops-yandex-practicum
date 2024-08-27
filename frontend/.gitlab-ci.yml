@@ -13,7 +13,6 @@ build-frontend-code-job:
       - frontend/dist/frontend
       - frontend_job_variables.env
 
-
 sonarqube-frontend-sast:
   stage: test
   only:

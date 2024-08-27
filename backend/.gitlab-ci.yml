@@ -47,7 +47,7 @@ sonarqube-backend-sast:
       -Dsonar.login=${SONAR_LOGIN_BACK} 
       -Dsonar.projectName=${SONAR_PROJECT_NAME_BACK}
   needs:
-    - sonarqube-backend-sast
+    - build-backend-code-job
 
 semgrep-sast:
   stage: test
