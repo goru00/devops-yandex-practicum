@@ -8,10 +8,6 @@ build-frontend-code-job:
   only:
     - pushes
     - merge_requests
-  cache:
-    - key: npm
-      paths: 
-        - frontend/.npm
   artifacts:
     paths:
       - frontend/dist/frontend
