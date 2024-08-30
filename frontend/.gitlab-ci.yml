@@ -56,4 +56,3 @@ telegram-notification-frontend:
   needs:
     - build-frontend-code-job
     - sonarqube-frontend-sast
-    - nodejs-scan-sast
