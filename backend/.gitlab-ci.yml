@@ -82,5 +82,4 @@ telegram-notification-backend:
   needs:
     - build-backend-code-job
     - sonarqube-backend-sast
-    - semgrep-sast
   
