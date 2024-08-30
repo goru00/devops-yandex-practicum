@@ -56,6 +56,9 @@ sonarqube-backend-sast:
 
 semgrep-sast:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push'
+    - if: ('$CI_PIPELINE_SOURCE == "merge_request_event"' && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH)
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 16
