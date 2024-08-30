@@ -11,9 +11,13 @@ build-backend-code-job:
     - pushes
     - merge_requests
   cache:
-    - key: maven
-      paths:
-        - .m2/repository
+    policy: pull-push
+    unprotect: false
+    untracked: false
+    when: on_success
+    key: maven
+    paths:
+      - .m2/repository
   artifacts:
     expire_in: 1 day
     paths:
@@ -34,6 +38,9 @@ sonarqube-backend-sast:
     - key: sonar
       paths: 
         - .sonar/cache
+    - key: maven
+      paths:
+        - .m2/repository
   allow_failure: true
   script:
     - cd backend
@@ -44,7 +51,7 @@ sonarqube-backend-sast:
       -Dsonar.login=${SONAR_LOGIN_BACK} 
       -Dsonar.projectName=${SONAR_PROJECT_NAME_BACK}
       -Dmaven.repo.local=${MAVEN_REPO_PATH}
-  dependencies:
+  needs:
     - build-backend-code-job
 
 semgrep-sast:
@@ -56,7 +63,11 @@ semgrep-sast:
     COMPILE: "false"
     SAST_JAVA_VERSION: 16
     MAVEN_REPO_PATH: ${MAVEN_REPO_PATH}
-  dependencies:
+  cache:
+    - key: maven
+      paths: 
+        - .m2/repository
+  needs:
     - build-backend-code-job
 
 telegram-notification-backend:
