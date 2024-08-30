@@ -58,7 +58,10 @@ semgrep-sast:
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'push'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
     - if: ('$CI_PIPELINE_SOURCE == "merge_request_event"' && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH)
+      when: always
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 16
