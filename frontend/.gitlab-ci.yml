@@ -15,7 +15,9 @@ build-frontend-code-job:
 
 sonarqube-frontend-sast:
   stage: test
-  when: always
+  only:
+    - pushes
+    - merge_requests
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
@@ -53,3 +55,5 @@ telegram-notification-frontend:
       curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал frontend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_FRONTEND_JOB_ID}/artifacts/download\"}"
   needs:
     - build-frontend-code-job
+    - sonarqube-frontend-sast
+    - nodejs-scan-sast
