@@ -55,9 +55,7 @@ sonarqube-backend-sast:
 
 semgrep-sast:
   stage: test
-  rules:
-    - changes: 
-      - backend/**/*
+  when: always
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 16

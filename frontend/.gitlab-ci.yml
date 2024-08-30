@@ -15,9 +15,7 @@ build-frontend-code-job:
 
 sonarqube-frontend-sast:
   stage: test
-  rules:
-    - changes: 
-      - backend/**/*
+  when: always
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
