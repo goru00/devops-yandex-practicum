@@ -23,14 +23,13 @@ build-backend-code-job:
     paths:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
       - backend_job_variables.env
-      - ${CI_PROJECT_DIR}/.m2/
 
 sonarqube-backend-sast:
   stage: test
   image: maven:3.8-openjdk-16
-  only:
-    - pushes
-    - merge_requests
+  rules:
+    - changes: 
+      - backend/**/*
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
     GIT_DEPTH: "0"
@@ -57,11 +56,8 @@ sonarqube-backend-sast:
 semgrep-sast:
   stage: test
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never
-    - if: ('$CI_PIPELINE_SOURCE == "merge_request_event"' && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH)
-      when: always
+    - changes: 
+      - backend/**/*
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 16
@@ -84,6 +80,4 @@ telegram-notification-backend:
       curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал backend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_BACKEND_JOB_ID}/artifacts/download\"}"
   needs:
     - build-backend-code-job
-    - sonarqube-backend-sast
-    - semgrep-sast
   
