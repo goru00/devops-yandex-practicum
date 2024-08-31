@@ -1,30 +1,77 @@
-stages:
-  - build
-  - notify
+variables:
+  MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
 
 build-backend-code-job:
   stage: build
   script:
     - echo "BUILD_BACKEND_JOB_ID=${CI_JOB_ID}" > backend_job_variables.env
     - cd backend
-    - mvn package
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /send notification/
-      changes:
-        - backend/**/*
+    - mvn package -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  only:
+    - pushes
+    - merge_requests
+  cache:
+    policy: pull-push
+    unprotect: false
+    untracked: false
+    when: on_success
+    key: maven
+    paths:
+      - .m2/repository
   artifacts:
+    expire_in: 1 day
     paths:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
       - backend_job_variables.env
 
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16
+  only:
+    - pushes
+    - merge_requests
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    - key: sonar
+      paths: 
+        - .sonar/cache
+    - key: maven
+      paths:
+        - .m2/repository
+  allow_failure: true
+  script:
+    - cd backend
+    - >
+      mvn verify sonar:sonar -Dsonar.qualitygate.wait=true 
+      -Dsonar.projectKey=${SONAR_PROJECT_KEY_BACK} 
+      -Dsonar.host.url=${SONAR_URL} 
+      -Dsonar.login=${SONAR_LOGIN_BACK} 
+      -Dsonar.projectName=${SONAR_PROJECT_NAME_BACK}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  needs:
+    - build-backend-code-job
+
+semgrep-sast:
+  stage: test
+  when: always
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 16
+    MAVEN_REPO_PATH: ${MAVEN_REPO_PATH}
+  cache:
+    - key: maven
+      paths: 
+        - .m2/repository
+  needs:
+    - build-backend-code-job
+
 telegram-notification-backend:
   stage: notify
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /send notification/
-      changes:
-        - backend/**/*
-  variables:
-    API_TELEGRAM: "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+  only:
+    - pushes
+    - merge_requests
   script:
     - source backend_job_variables.env
     - |
