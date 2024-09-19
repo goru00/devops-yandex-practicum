@@ -78,4 +78,19 @@ telegram-notification-backend:
       curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал backend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_BACKEND_JOB_ID}/artifacts/download\"}"
   needs:
     - build-backend-code-job
+
+upload-backend-release:
+  stage: release
+  only:
+    changes:
+      - backend/**/*
+  needs:
+    - build-backend-code-job
+  script:
+    - cd backend
+    - >
+      mvn deploy -DskipTests
+      -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
+      -s settings.xml -Dversion.application=${VERSION} 
+  
   

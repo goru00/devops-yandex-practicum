@@ -1,10 +1,16 @@
 variables:
   API_TELEGRAM: https://api.telegram.org/bot${TELEGRAM_CHAT_TOKEN}/sendMessage
 
+cache:
+  paths:
+    - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
+    - .npm/ # для хранения зависимостей сборки фронтенда 
+
 stages:
   - build
   - test
   - notify
+  - release
 
 include:
   - local: /backend/.gitlab-ci.yml
