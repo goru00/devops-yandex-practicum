@@ -27,8 +27,8 @@ build-frontend-code-job:
 upload-frontend-release:
   stage: release
   only:
-    - pushes
-    - merge_requests
+     changes:
+     - frontend/**/* 
   needs:
     - build-frontend-code-job
   script:
