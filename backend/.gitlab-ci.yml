@@ -82,9 +82,6 @@ semgrep-sast:
     - key: maven
       paths: 
         - .m2/repository
-  only:
-    - pushes
-    - merge_requests
   needs:
     - build-backend-code-job
 
