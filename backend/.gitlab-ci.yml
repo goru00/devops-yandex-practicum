@@ -18,7 +18,10 @@ build-backend-code-job:
   script:
     - echo "BUILD_BACKEND_JOB_ID=${CI_JOB_ID}" > backend_job_variables.env
     - cd backend
-    - mvn package -Dmaven.repo.local=${MAVEN_REPO_PATH}
+    - >
+      mvn package
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
   only:
     - pushes
     - merge_requests
