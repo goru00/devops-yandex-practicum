@@ -96,7 +96,6 @@ upload-backend-release:
       -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
       -s settings.xml -Dversion.application=${VERSION} 
 
-
 telegram-notification-backend:
   stage: notify
   only:
