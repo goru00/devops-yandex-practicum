@@ -16,13 +16,9 @@ build-frontend-code-job:
     - cd frontend
     - npm install
     - npm run build
-  only:
-    - pushes
-    - merge_requests
-  artifacts:
-    paths:
-      - frontend/dist/frontend
-      - frontend_job_variables.env
+  rules:
+    - changes: 
+      - frontend/**/*
 
 upload-frontend-release:
   stage: release
