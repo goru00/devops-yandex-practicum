@@ -1,5 +1,17 @@
 variables:
   MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
+  VERSION: 1.0.${CI_PIPELINE_ID}
+  JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+
+cache:
+  paths:
+    - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
+
+stages:
+  - build
+  - test
+  - release
+  - notify
 
 build-backend-code-job:
   stage: build
@@ -67,18 +79,6 @@ semgrep-sast:
   needs:
     - build-backend-code-job
 
-telegram-notification-backend:
-  stage: notify
-  only:
-    - pushes
-    - merge_requests
-  script:
-    - source backend_job_variables.env
-    - |
-      curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал backend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_BACKEND_JOB_ID}/artifacts/download\"}"
-  needs:
-    - build-backend-code-job
-
 upload-backend-release:
   stage: release
   only:
@@ -92,5 +92,17 @@ upload-backend-release:
       mvn deploy -DskipTests
       -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
       -s settings.xml -Dversion.application=${VERSION} 
+
+telegram-notification-backend:
+  stage: notify
+  only:
+    - pushes
+    - merge_requests
+  script:
+    - source backend_job_variables.env
+    - |
+      curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал backend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_BACKEND_JOB_ID}/artifacts/download\"}"
+  needs:
+    - build-backend-code-job
   
   

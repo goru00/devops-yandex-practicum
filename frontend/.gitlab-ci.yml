@@ -1,3 +1,16 @@
+cache:
+  paths:
+    - frontend/dist/frontend
+
+variables:
+  VERSION: 1.0.${CI_PIPELINE_ID}
+
+stages:
+  - build
+  - test
+  - release
+  - notify
+
 build-frontend-code-job:
   stage: build
   script:
@@ -43,20 +56,6 @@ sonarqube-frontend-sast:
   needs:
     - build-frontend-code-job
 
-
-telegram-notification-frontend:
-  stage: notify
-  only:
-    - pushes
-    - merge_requests
-  script:
-    - source frontend_job_variables.env
-    - |
-      curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал frontend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_FRONTEND_JOB_ID}/artifacts/download\"}"
-  needs:
-    - build-frontend-code-job
-    - sonarqube-frontend-sast
-
 upload-frontend-release:
   stage: release
   only:
@@ -71,3 +70,16 @@ upload-frontend-release:
       curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
       --upload-file sausage-store-${VERSION}.tar.gz
       ${NEXUS_REPO_URL}/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
+
+telegram-notification-frontend:
+  stage: notify
+  only:
+    - pushes
+    - merge_requests
+  script:
+    - source frontend_job_variables.env
+    - |
+      curl -X POST "${API_TELEGRAM}" -H "Content-Type: application/json" --data "{\"chat_id\":\"-1002185373712\", \"text\":\"Дмитрий Третьяков собрал frontend-приложение. URL артефакта ${CI_PROJECT_URL}/-/jobs/${BUILD_FRONTEND_JOB_ID}/artifacts/download\"}"
+  needs:
+    - build-frontend-code-job
+    - sonarqube-frontend-sast
