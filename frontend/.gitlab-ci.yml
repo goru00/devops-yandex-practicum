@@ -62,8 +62,8 @@ sonarqube-frontend-sast:
 upload-frontend-release:
   stage: release
   only:
-    changes:
-      - frontend/**/*
+    - pushes
+    - merge_requests
   needs:
     - build-frontend-code-job
   script:
