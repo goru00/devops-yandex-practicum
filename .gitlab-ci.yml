@@ -35,6 +35,8 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
+    - echo "${DEV_HOST}" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh ${DEV_USER}@${DEV_HOST} "id" 
   

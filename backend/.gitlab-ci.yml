@@ -67,6 +67,7 @@ sonarqube-backend-sast:
   needs:
     - build-backend-code-job
 
+
 semgrep-sast:
   stage: test
   when: always
