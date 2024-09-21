@@ -1,9 +1,6 @@
 variables:
   API_TELEGRAM: https://api.telegram.org/bot${TELEGRAM_CHAT_TOKEN}/sendMessage
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
-
 stages:
   - module-pipelines
   - deploy
@@ -13,6 +10,7 @@ frontend:
   trigger:
     include:
       - local: "/frontend/.gitlab-ci.yml"
+      - template: Security/SAST.gitlab-ci.yml
     strategy: depend
   only:
     - pushes
@@ -23,6 +21,7 @@ backend:
   trigger:
     include:
       - local: "/backend/.gitlab-ci.yml"
+      - template: Security/SAST.gitlab-ci.yml
     strategy: depend
   only:
     - pushes

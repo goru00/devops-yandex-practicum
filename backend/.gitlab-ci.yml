@@ -33,6 +33,10 @@ build-backend-code-job:
     key: maven
     paths:
       - .m2/repository
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - backend_job_variables.env
 
 sonarqube-backend-sast:
   stage: test
