@@ -12,8 +12,8 @@ frontend:
       - local: "/frontend/.gitlab-ci.yml"
     strategy: depend
   only:
-    changes:
-      - frontend/**/*
+    - pushes
+    - merge_requests
 
 backend:
   stage: module-pipelines
@@ -22,8 +22,8 @@ backend:
       - local: "/backend/.gitlab-ci.yml"
     strategy: depend
   only:
-    changes:  
-      - backend/**/* 
+    - pushes
+    - merge_requests
 
 deploy:
   stage: deploy
