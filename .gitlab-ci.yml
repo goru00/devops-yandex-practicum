@@ -6,7 +6,6 @@ include:
 
 stages:
   - module-pipelines
-  - deploy
 
 frontend:
   stage: module-pipelines

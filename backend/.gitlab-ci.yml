@@ -68,6 +68,20 @@ sonarqube-backend-sast:
   needs:
     - build-backend-code-job
 
+semgrep-sast:
+  stage: test
+  when: always
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 16
+    MAVEN_REPO_PATH: ${MAVEN_REPO_PATH}
+  cache:
+    - key: maven
+      paths: 
+        - .m2/repository
+  needs:
+    - build-backend-code-job
+
 upload-backend-release:
   stage: release
   only:
