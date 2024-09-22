@@ -97,7 +97,6 @@ upload-backend-release:
       -s settings.xml -Dversion.application=${VERSION} 
 
 
-
 telegram-notification-backend:
   stage: notify
   only:
