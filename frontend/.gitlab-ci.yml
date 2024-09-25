@@ -66,7 +66,6 @@ upload-frontend-release:
       --upload-file sausage-store-${VERSION}.tar.gz
       ${NEXUS_REPO_URL}/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
 
-
 telegram-notification-frontend:
   stage: notify
   rules:

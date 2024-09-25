@@ -15,9 +15,9 @@
         <version>2.5.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.yandex.practicum.devops</groupId>
-    <artifactId>sausage-store</artifactId>
-    <version>${env.VERSION}-SNAPSHOT</version>
+    <groupId>com.yandex.practicum.devops.sausage-store</groupId>
+    <artifactId>${env.VERSION-SNAPSHOT}</artifactId>
+    <version>${env.VERSION}</version>
     <name>sausage-store</name>
     <description>Backend for sausage-store</description>
     <properties>
