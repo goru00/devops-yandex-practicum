@@ -18,18 +18,18 @@ build-frontend-code-job:
     - cd frontend
     - npm install
     - npm run build
-  only:
-    - pushes
-    - merge_requests
+  rules:
+    - changes: 
+      - frontend/**/*
   artifacts:
     paths:
       - frontend_job_variables.env
 
 sonarqube-frontend-sast:
   stage: test
-  only:
-    - pushes
-    - merge_requests
+  rules:
+    - changes: 
+      - frontend/**/*
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
@@ -58,8 +58,8 @@ sonarqube-frontend-sast:
 upload-frontend-release:
   stage: release
   only:
-    - pushes
-    - merge_requests 
+     changes:
+     - frontend/**/* 
   needs:
     - build-frontend-code-job
   script:
@@ -71,9 +71,9 @@ upload-frontend-release:
 
 telegram-notification-frontend:
   stage: notify
-  only:
-    - pushes
-    - merge_requests
+  rules:
+    - changes: 
+      - frontend/**/*
   script:
     - source frontend_job_variables.env
     - |
