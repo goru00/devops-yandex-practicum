@@ -52,7 +52,6 @@ sonarqube-frontend-sast:
   needs:
     - build-frontend-code-job
 
-
 upload-frontend-release:
   stage: release
   only:
