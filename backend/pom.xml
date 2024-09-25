@@ -6,7 +6,7 @@
         <repository>
             <id>sausage-store</id>
             <name>sausage-store</name>
-            <url>${env.NEXUS_REPO_URL}/${env.NEXUS_REPO_BACKEND_NAME}/com/yandex/practicum/devops/sausage-store/${env.VERSION}</url>
+            <url>${env.NEXUS_REPO_URL}/repository/${env.NEXUS_REPO_BACKEND_NAME}</url>
         </repository>
     </distributionManagement>
     <parent>
