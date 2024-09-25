@@ -25,6 +25,7 @@ build-frontend-code-job:
     paths:
       - frontend_job_variables.env
 
+
 sonarqube-frontend-sast:
   stage: test
   rules:
